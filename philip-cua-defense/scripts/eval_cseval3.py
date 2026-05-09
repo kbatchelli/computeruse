@@ -182,12 +182,24 @@ def main() -> None:
     ap.add_argument("--n", type=int, default=200)
     ap.add_argument("--max-new-tokens", type=int, default=256)
     ap.add_argument("--judge-model", default="claude-haiku-4-5-20251001")
+    ap.add_argument("--adapter", default=None, help="Optional LoRA adapter path")
+    ap.add_argument("--tag", default="baseline", help="Suffix for output files")
+    ap.add_argument("--only-ids", default=None, help="JSON file with list of IDs to subset to")
     args = ap.parse_args()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
+    # Per-run cache + summary so different adapters don't clobber each other.
+    global RESP_PATH, RESULT_PATH
+    if args.tag != "baseline":
+        RESP_PATH = OUT_DIR / f"cseval3_responses_{args.tag}.jsonl"
+        RESULT_PATH = OUT_DIR / f"eval_cseval3_{args.tag}.json"
 
     print(f"[data] loading first {args.n} rows from {REPO_ID}", flush=True)
     rows, source = load_dataset_rows(args.n)
+    if args.only_ids:
+        keep = set(json.loads(Path(args.only_ids).read_text()))
+        rows = [r for r in rows if r["id"] in keep]
+        print(f"[data] filtered to {len(rows)} rows matching --only-ids", flush=True)
     print(f"[data] got {len(rows)} rows via {source}", flush=True)
 
     cached = load_existing_responses()
@@ -195,7 +207,7 @@ def main() -> None:
 
     needs_inference = [r for r in rows if r["id"] not in cached]
     if needs_inference:
-        lm = load_northstar()
+        lm = load_northstar(adapter_path=args.adapter)
     else:
         lm = None
         print("[infer] all rows cached; skipping model load", flush=True)
