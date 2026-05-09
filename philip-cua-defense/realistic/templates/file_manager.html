@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Files</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style> body { font-family: 'Inter', system-ui, sans-serif; } </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <div class="flex h-screen">
+    <aside class="w-52 bg-white border-r border-slate-200 flex flex-col text-sm">
+      <div class="px-4 py-3 border-b border-slate-200 flex items-center gap-2">
+        <div class="w-7 h-7 rounded bg-amber-500 text-white flex items-center justify-center font-bold">F</div>
+        <div class="font-semibold">Files</div>
+      </div>
+      <nav class="py-2">
+        <div class="px-4 py-1 text-xs uppercase text-slate-400 tracking-wider">Quick</div>
+        <a class="flex items-center gap-2 px-4 py-1.5 hover:bg-slate-100" href="#" data-target="sidebar_recent">Recent</a>
+        <a class="flex items-center gap-2 px-4 py-1.5 hover:bg-slate-100" href="#" data-target="sidebar_starred">Starred</a>
+        <div class="px-4 py-1 mt-2 text-xs uppercase text-slate-400 tracking-wider">Places</div>
+        <a class="flex items-center gap-2 px-4 py-1.5 hover:bg-slate-100" href="#" data-target="sidebar_home">Home</a>
+        <a class="flex items-center gap-2 px-4 py-1.5 hover:bg-slate-100" href="#" data-target="sidebar_documents">Documents</a>
+        <a class="flex items-center gap-2 px-4 py-1.5 hover:bg-slate-100 text-slate-900 font-medium bg-slate-100 border-l-2 border-amber-500" href="#" data-target="sidebar_downloads">Downloads</a>
+        <a class="flex items-center gap-2 px-4 py-1.5 hover:bg-slate-100" href="#" data-target="sidebar_pictures">Pictures</a>
+        <a class="flex items-center gap-2 px-4 py-1.5 hover:bg-slate-100" href="#" data-target="sidebar_music">Music</a>
+        <a class="flex items-center gap-2 px-4 py-1.5 hover:bg-slate-100" href="#" data-target="sidebar_videos">Videos</a>
+        <a class="flex items-center gap-2 px-4 py-1.5 hover:bg-slate-100" href="#" data-target="sidebar_trash">Trash</a>
+      </nav>
+    </aside>
+
+    <div class="flex-1 flex flex-col">
+      <header class="bg-white border-b border-slate-200 px-4 py-2 flex items-center gap-2">
+        <button class="px-2 py-1 text-slate-500 hover:bg-slate-100 rounded" data-target="back_btn">&larr;</button>
+        <button class="px-2 py-1 text-slate-500 hover:bg-slate-100 rounded" data-target="forward_btn">&rarr;</button>
+        <div class="flex items-center gap-1 text-sm text-slate-700 ml-2">
+          <span>/</span><span>home</span><span>/</span><span>user</span><span>/</span><span class="font-medium" data-target="current_dir">{{DIR_NAME}}</span>
+        </div>
+        <div class="ml-auto flex gap-2">
+          <input class="border border-slate-300 rounded px-3 py-1 text-sm w-56" placeholder="Search files…" data-target="search_input"/>
+          <button class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-100" data-target="view_grid">Grid</button>
+          <button class="px-2 py-1 text-sm border border-slate-300 rounded bg-slate-100" data-target="view_list">List</button>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-auto p-4">
+        <table class="w-full text-sm">
+          <thead class="text-xs text-slate-500 uppercase tracking-wider border-b border-slate-200">
+            <tr><th class="text-left py-2">Name</th><th class="text-left">Size</th><th class="text-left">Modified</th><th class="text-left">Type</th></tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr class="hover:bg-slate-50"><td class="py-2 flex items-center gap-2"><span>📄</span> Q2-strategy.pdf</td><td>2.1 MB</td><td>May 8</td><td>PDF</td></tr>
+            <tr class="hover:bg-slate-50"><td class="py-2 flex items-center gap-2"><span>🖼️</span> screenshot-2026-05-07.png</td><td>418 KB</td><td>May 7</td><td>Image</td></tr>
+            <tr class="hover:bg-slate-50"><td class="py-2 flex items-center gap-2"><span>📦</span> chromium-installer.dmg</td><td>112 MB</td><td>May 6</td><td>Disk image</td></tr>
+            <tr class="hover:bg-slate-50"><td class="py-2 flex items-center gap-2"><span>📊</span> budget-2026.xlsx</td><td>88 KB</td><td>May 5</td><td>Spreadsheet</td></tr>
+            <tr class="hover:bg-slate-50"><td class="py-2 flex items-center gap-2"><span>📁</span> invoices/</td><td>—</td><td>May 4</td><td>Folder</td></tr>
+            <tr class="hover:bg-slate-50"><td class="py-2 flex items-center gap-2"><span>📄</span> meeting-notes.md</td><td>14 KB</td><td>May 3</td><td>Markdown</td></tr>
+            <tr class="hover:bg-slate-50"><td class="py-2 flex items-center gap-2"><span>🎵</span> demo-mix.mp3</td><td>4.2 MB</td><td>May 2</td><td>Audio</td></tr>
+            <tr class="hover:bg-slate-50"><td class="py-2 flex items-center gap-2"><span>📁</span> archive/</td><td>—</td><td>Apr 30</td><td>Folder</td></tr>
+          </tbody>
+        </table>
+      </main>
+      <footer class="bg-white border-t border-slate-200 px-4 py-1 text-xs text-slate-500">8 items · 119 MB</footer>
+    </div>
+  </div>
+</body>
+</html>

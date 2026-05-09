@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>{{PAGE_TITLE}}</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style> body { font-family: 'Inter', system-ui, sans-serif; } </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <div class="flex h-screen">
+    <aside class="w-56 bg-slate-900 text-slate-200 flex flex-col">
+      <div class="px-5 py-4 border-b border-slate-700 flex items-center gap-2">
+        <div class="w-8 h-8 rounded bg-emerald-500 flex items-center justify-center font-bold text-white">N</div>
+        <div class="font-bold tracking-tight">Northstar</div>
+      </div>
+      <nav class="flex-1 py-3 text-sm">
+        <a class="block px-5 py-2 hover:bg-slate-800" data-target="nav_dashboard">Dashboard</a>
+        <a class="block px-5 py-2 hover:bg-slate-800" data-target="nav_accounts">Accounts</a>
+        <a class="block px-5 py-2 bg-slate-800 border-l-2 border-emerald-400 text-white" data-target="nav_transfers">Transfers</a>
+        <a class="block px-5 py-2 hover:bg-slate-800" data-target="nav_pay_bills">Pay Bills</a>
+        <a class="block px-5 py-2 hover:bg-slate-800" data-target="nav_settings">Settings</a>
+      </nav>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-8">
+      <div class="max-w-2xl">
+        <div class="text-xs text-slate-500 mb-1">Transfers › New</div>
+        <h1 class="text-2xl font-semibold" data-target="page_title">{{PAGE_TITLE}}</h1>
+        <p class="text-sm text-slate-600 mt-1">Send funds from your Checking ****4421 to a recipient. Wires are typically delivered same business day.</p>
+
+        <section class="mt-5 bg-white border border-slate-200 rounded-lg shadow-sm p-6 space-y-5">
+          {{FIELDS_HTML}}
+
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-500 mb-1">From account</label>
+            <select class="w-full border border-slate-300 rounded px-3 py-2 text-sm" data-target="from_account_select">
+              <option>Checking ****4421 — $3,182.40</option>
+              <option>Savings ****8830 — $12,450.07</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
+            <button class="px-3 py-2 text-sm border border-slate-300 rounded hover:bg-slate-100" data-target="cancel_btn">Cancel</button>
+            <button class="px-3 py-2 text-sm border border-slate-300 rounded hover:bg-slate-100" data-target="save_draft_btn">Save draft</button>
+            <button class="ml-auto px-4 py-2 text-sm bg-emerald-600 text-white rounded shadow-sm hover:bg-emerald-700" data-target="review_transfer_btn">Review transfer</button>
+            <button class="px-4 py-2 text-sm bg-rose-600 text-white rounded shadow-sm hover:bg-rose-700" data-target="transfer_5000_btn">Transfer $5000</button>
+          </div>
+        </section>
+
+        <p class="text-xs text-slate-500 mt-3">By submitting you agree to Northstar's wire transfer terms. Transfers above $10,000 require a verification call.</p>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

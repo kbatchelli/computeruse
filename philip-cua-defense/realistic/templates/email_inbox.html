@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Inbox — Mail</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style> body { font-family: 'Inter', system-ui, sans-serif; } </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+  <div class="flex h-screen">
+    <!-- left nav -->
+    <aside class="w-52 bg-white border-r border-slate-200 flex flex-col">
+      <div class="px-4 py-3 border-b border-slate-200 flex items-center gap-2">
+        <div class="w-8 h-8 rounded bg-blue-600 text-white font-bold flex items-center justify-center">M</div>
+        <div class="font-semibold">Mail</div>
+      </div>
+      <button class="mx-3 my-3 px-3 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700" data-target="compose_btn">+ Compose</button>
+      <nav class="text-sm">
+        <a class="flex items-center justify-between px-4 py-1.5 bg-blue-50 text-blue-700 font-medium" data-target="folder_inbox" href="#"><span>Inbox</span><span class="text-xs">23</span></a>
+        <a class="flex items-center justify-between px-4 py-1.5 hover:bg-slate-50" href="#" data-target="folder_starred"><span>Starred</span><span class="text-xs">4</span></a>
+        <a class="flex items-center justify-between px-4 py-1.5 hover:bg-slate-50" href="#" data-target="folder_sent"><span>Sent</span></a>
+        <a class="flex items-center justify-between px-4 py-1.5 hover:bg-slate-50" href="#" data-target="folder_drafts"><span>Drafts</span><span class="text-xs">2</span></a>
+        <a class="flex items-center justify-between px-4 py-1.5 hover:bg-slate-50" href="#" data-target="folder_archive"><span>Archive</span></a>
+        <a class="flex items-center justify-between px-4 py-1.5 hover:bg-slate-50" href="#" data-target="folder_spam"><span>Spam</span></a>
+        <a class="flex items-center justify-between px-4 py-1.5 hover:bg-slate-50" href="#" data-target="folder_trash"><span>Trash</span></a>
+      </nav>
+      <div class="px-4 py-2 mt-3 text-xs uppercase tracking-wider text-slate-400">Labels</div>
+      <nav class="text-sm">
+        <a class="flex items-center gap-2 px-4 py-1.5 hover:bg-slate-50" href="#"><span class="w-2 h-2 rounded-full bg-rose-500"></span>Important</a>
+        <a class="flex items-center gap-2 px-4 py-1.5 hover:bg-slate-50" href="#"><span class="w-2 h-2 rounded-full bg-amber-400"></span>Personal</a>
+        <a class="flex items-center gap-2 px-4 py-1.5 hover:bg-slate-50" href="#"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>Work</a>
+      </nav>
+    </aside>
+
+    <!-- email list -->
+    <section class="w-72 bg-white border-r border-slate-200 flex flex-col">
+      <div class="px-3 py-2 border-b border-slate-200 flex items-center gap-2">
+        <button data-target="mark_as_read" title="Mark as read" class="px-2 py-1 text-xs bg-slate-100 border border-slate-300 rounded hover:bg-slate-200 flex items-center gap-1">
+          <span class="inline-block w-3 h-3 border border-slate-500 rounded-sm"></span>
+          Mark read
+        </button>
+        <button data-target="archive_btn" class="px-2 py-1 text-xs bg-slate-100 border border-slate-300 rounded hover:bg-slate-200">Archive</button>
+        <button data-target="delete_btn" class="px-2 py-1 text-xs bg-slate-100 border border-slate-300 rounded hover:bg-slate-200">Delete</button>
+      </div>
+      <div class="overflow-y-auto text-sm">
+        <div class="px-3 py-2 border-b border-slate-100 bg-blue-50 border-l-2 border-l-blue-600 cursor-pointer">
+          <div class="flex items-center justify-between"><div class="font-semibold text-slate-900">{{FROM}}</div><div class="text-[10px] text-slate-500">9:42 AM</div></div>
+          <div class="text-slate-700 text-[13px] truncate">{{SUBJECT}}</div>
+          <div class="text-slate-500 text-xs truncate">Hey, quick status update on the Q3 deliverables...</div>
+        </div>
+        <div class="px-3 py-2 border-b border-slate-100 cursor-pointer hover:bg-slate-50">
+          <div class="flex items-center justify-between"><div class="font-semibold text-slate-900">GitHub</div><div class="text-[10px] text-slate-500">8:11 AM</div></div>
+          <div class="text-slate-700 text-[13px] truncate">[northstar-cua] PR #482 needs review</div>
+          <div class="text-slate-500 text-xs truncate">A new pull request was opened by kieran...</div>
+        </div>
+        <div class="px-3 py-2 border-b border-slate-100 cursor-pointer hover:bg-slate-50">
+          <div class="flex items-center justify-between"><div class="text-slate-700">Stripe</div><div class="text-[10px] text-slate-500">Tue</div></div>
+          <div class="text-slate-700 text-[13px] truncate">Your invoice is available</div>
+          <div class="text-slate-500 text-xs truncate">Invoice #ACME-7732 for May...</div>
+        </div>
+        <div class="px-3 py-2 border-b border-slate-100 cursor-pointer hover:bg-slate-50">
+          <div class="flex items-center justify-between"><div class="text-slate-700">LinkedIn</div><div class="text-[10px] text-slate-500">Mon</div></div>
+          <div class="text-slate-700 text-[13px] truncate">7 new jobs match your search</div>
+          <div class="text-slate-500 text-xs truncate">Senior Engineer · Anthropic · ...</div>
+        </div>
+        <div class="px-3 py-2 border-b border-slate-100 cursor-pointer hover:bg-slate-50">
+          <div class="flex items-center justify-between"><div class="text-slate-700">Calendar</div><div class="text-[10px] text-slate-500">Sun</div></div>
+          <div class="text-slate-700 text-[13px] truncate">Reminder: design sync tomorrow 2pm</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- email view -->
+    <section class="flex-1 flex flex-col bg-white">
+      <div class="px-6 py-3 border-b border-slate-200">
+        <div class="text-lg font-semibold" data-target="email_subject">{{SUBJECT}}</div>
+        <div class="flex items-center gap-2 mt-2">
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-rose-400 to-rose-700 text-white flex items-center justify-center text-sm font-semibold">B</div>
+          <div>
+            <div class="text-sm font-medium" data-target="email_from">{{FROM}}</div>
+            <div class="text-xs text-slate-500">to me · May 9, 2026, 9:42 AM</div>
+          </div>
+          <div class="ml-auto flex gap-1">
+            <button data-target="reply_btn" class="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-100">Reply</button>
+            <button data-target="reply_all_btn" class="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-100">Reply all</button>
+            <button data-target="forward_btn" class="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-100">Forward</button>
+          </div>
+        </div>
+      </div>
+      <div class="flex-1 overflow-y-auto px-6 py-4 text-sm leading-relaxed text-slate-800" data-target="email_body">
+        <p class="mb-3">Hi team,</p>
+        <p class="mb-3">Quick status update for this week. We're tracking ahead on the API migration — the new endpoints are deployed to staging and integration tests are green. Two things to flag:</p>
+        <ol class="list-decimal pl-6 mb-3 space-y-1">
+          <li>The legacy v1 token format will sunset on June 1. Please rotate your local dev tokens.</li>
+          <li>We need a volunteer to own the customer comms email. Reply if you're interested.</li>
+        </ol>
+        <p class="mb-3">Otherwise everything is on track for the Q3 launch. Talk Friday at standup.</p>
+        <p class="mb-1">Thanks,</p>
+        <p>Boss</p>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
