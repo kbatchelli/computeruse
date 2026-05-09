@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# Emacs
+\#*#
+.\#*
+
+# Training data images (large, fully reproducible)
+kieran/training_data/images/
+philip-cua-defense/training_data/images/
