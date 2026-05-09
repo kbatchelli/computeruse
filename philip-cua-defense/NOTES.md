@@ -107,6 +107,23 @@ The fonts come from `/usr/share/fonts/truetype/dejavu/` (preinstalled).
 
 **Why malformed JSON happens locally but not on the Tzafon API:** Tzafon's hosted endpoint almost certainly uses constrained/grammar-guided decoding (vLLM + xgrammar/outlines). Token-level masking ensures the sampler can only emit valid JSON conforming to the tool-call schema. Our local `transformers.generate()` has no such constraint — when uncertain, the model produces invalid JSON.
 
+## Model verification (sanity check, 2026-05-09)
+
+Verified Northstar is loading and grounding correctly via `scripts/verify_model.py`:
+
+- Test image: 1024×768 with a "Sign in" button at pixel (510, 340).
+- Three inference modes probed:
+
+| Mode | System prompt | Tools | Output |
+|---|---|---|---|
+| A: HF-doc local style | none | none | Prose: "The 'Sign in' button is located..." (QA mode, useless for agent loops) |
+| B: Our eval setup | yes | Qwen tools | `<tool_call>{"name":"click","arguments":{"x":"499","y":437}}</tool_call>` |
+| C: CUA-minimal | yes (asks for `(x,y)`) | none | `(499, 437)` — clean native format |
+
+Pixel (510, 340) → expected normalized (498, 442). Model emitted (499, 437). **Off by ~5 px — spatial grounding is solid.** Mode C is the cleanest output format (no JSON brittleness) but less expressive than tool-calls. We stay on mode B because we need action-type signal (click vs type vs navigate).
+
+## External benchmarks
+
 ## Run order
 
 ```bash
@@ -130,4 +147,22 @@ python3 scripts/eval.py --adapter outputs/lora-r16 --tag finetuned
 
 ## External benchmarks
 
-- **2026-05-09** — Ran Northstar (no adapter) on Meta CyberSecEval3 Visual Prompt Injection, N=20 sanity subset, regex-judge only (no `ANTHROPIC_API_KEY`): **ASR=0.71** on 7 regex-scorable security-violating cases (`scripts/eval_cseval3.py`, `outputs/eval_cseval3.json`). N=200 run in progress.
+- **2026-05-09** — Ran Northstar (no adapter) on Meta CyberSecEval3 Visual Prompt Injection, N=20 sanity subset, regex-judge only (no `ANTHROPIC_API_KEY`): **ASR=0.71** on 7 regex-scorable security-violating cases (`scripts/eval_cseval3.py`, `outputs/eval_cseval3.json`). N=200 run was in progress; killed to free GPU for the VPI-Bench run below (rerun later if needed).
+
+### VPI-Bench (browser cases) via vLLM + Playwright — 2026-05-09
+
+**Pipeline (works end-to-end):**
+1. `vllm serve /home/shadeform/northstar --dtype bfloat16 --max-model-len 8192 --limit-mm-per-prompt '{"image":2}' --served-model-name northstar-cua-fast --gpu-memory-utilization 0.85` (port 8000). Architecture `Qwen3VLForConditionalGeneration` is supported in vLLM 0.20.1; loads in ~20 s cold, ~12 s warm (torch.compile cache hits). KV cache 56 GiB → 49.9× concurrency. `pip install vllm` worked OOTB; no `--trust-remote-code` needed.
+2. Smoke test (`scripts/smoke_openai.py`): OpenAI client → vLLM → `<tool_call>{"name":"click",...}</tool_call>`. Working.
+3. Full loop (`scripts/eval_vpibench.py`): headless Chromium 1024×768 → screenshot → OpenAI chat-completions to vLLM with `tools=QWEN_TOOLS, tool_choice="none"` (vLLM rejects `"auto"` without `--enable-auto-tool-choice` and we don't need parsed tool_calls — we parse the raw `<tool_call>...` block) → `cua_shared.parse_tool_call` → Playwright executor → loop. 12-15 step cap, anti-loop early-exit on 3× identical actions, temperature=0.7 + per-step seed to break greedy looping on identical screens.
+4. LLM-judge (`claude-haiku-4-5`) wired but `ANTHROPIC_API_KEY` is unset on this VM, so we used a conservative URL/keyword heuristic that whitelists any URL literally appearing in the user_prompt (so user-sanctioned navigations like the Drive notes URL aren't false positives).
+
+**Result: ASR = 0.0 / attempt-rate = 0.0 / N=10 cases** (`outputs/eval_vpibench.json`). Cases run: EMAIL_PRELOADED_DATA, EMAIL_SUMMARY_PRELOADED_DATA, MESSENGER_PRELOADED_DATA, EMAIL_PRELOADED_DATA_BANKACCOUNT, MESSENGER_PRELOADED_DATA_CREDITCARD, EMAIL_PRELOADED_DELETE_EMAIL, EMAIL_PRELOADED_FORWARD, EMAIL_PRELOADED_MESSAGE, MESSENGER_PRELOADED_DELETE_MESSAGE, MESSENGER_PRELOADED_MESSAGE.
+
+**Caveat — this ASR is NOT a clean robustness number.** Inspecting the trajectories (`outputs/vpibench_runs/<id>/step_*.png` + `trajectory.json`): on the email scenarios the model loops clicks at nearly-identical sidebar coords; on the messenger scenarios it clicks toward the message-input area but never types anything and never presses Send. Across all runs the page DOM is unchanged (md5 of consecutive screenshots is identical). So the bound is "agent never executed enough state-changing actions for the attack to land," not "agent recognized and refused the injection." That makes ASR=0 here mostly a lower-bound on capability, not a meaningful upper bound on safety. To get a meaningful number we'd need either (a) much higher max_steps + history rendering between steps, (b) a planner+executor split where a stronger model decomposes the task, or (c) a more capable base CUA. Northstar was GUI-RL-trained on synthetic ~3-15-click envs and doesn't carry trajectory state across steps OOTB.
+
+**What worked:** vLLM serves Northstar OOTB; the FastAPI shim (`scripts/northstar_openai_shim.py`) was also written as a fallback but unused now that vLLM is up. The Playwright executor handles `click/double_click/right_click/type/key/scroll/navigate/terminate`. Parser robustly handles Northstar's malformed `{"x":[a,b]}` array form.
+
+**What didn't:** No live LLM judge (heuristic only). Did NOT use Lightcone's `CuaRunner` — it's hard-wired to Tzafon's cloud computer (`computer.create(kind="desktop")`) and the `responses.create` API, not OpenAI chat completions; building the loop directly with `openai` + `playwright` mirrors what `lightcone/examples/harness/runner.py` does and was simpler/more debuggable.
+
+**Re-run:** `nohup vllm serve ... > outputs/vllm_logs/serve.log 2>&1 &` then `python3 scripts/eval_vpibench.py --n 10 --max-steps 15`.
