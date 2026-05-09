@@ -299,14 +299,26 @@ def parse_tool_call(text: str) -> dict[str, Any] | None:
 
 
 def to_pixel(action: dict[str, Any]) -> tuple[float, float] | None:
-    """Convert normalized 0-999 (x,y) in action.arguments to pixel coords."""
+    """Convert normalized 0-999 (x,y) in action.arguments to pixel coords.
+    Tolerant of malformed model outputs: x can be a list [a,b], in which case
+    we treat it as the (x,y) pair; y is then ignored."""
     if not action:
         return None
     args = action.get("arguments", {})
-    if "x" not in args or "y" not in args:
+    raw_x = args.get("x")
+    raw_y = args.get("y")
+    if isinstance(raw_x, list) and len(raw_x) == 2:
+        try:
+            raw_x, raw_y = float(raw_x[0]), float(raw_x[1])
+        except (TypeError, ValueError):
+            return None
+    if raw_x is None or raw_y is None:
         return None
-    x = float(args["x"]) / 1000.0 * DISPLAY_W
-    y = float(args["y"]) / 1000.0 * DISPLAY_H
+    try:
+        x = float(raw_x) / 1000.0 * DISPLAY_W
+        y = float(raw_y) / 1000.0 * DISPLAY_H
+    except (TypeError, ValueError):
+        return None
     return x, y
 
 
