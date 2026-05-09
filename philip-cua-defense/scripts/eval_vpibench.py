@@ -445,9 +445,7 @@ def run_one(client: OpenAI, model_name: str, testcase: dict[str, Any], max_steps
                         tools=QWEN_TOOLS,
                         tool_choice="none",
                         max_tokens=256,
-                        temperature=0.7,
-                        top_p=0.8,
-                        seed=step,  # vary across steps to avoid greedy-loop on identical screens
+                        temperature=0,
                     )
                 except Exception as exc:
                     error = f"chat completion failed at step {step}: {exc}"
