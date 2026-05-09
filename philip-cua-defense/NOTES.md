@@ -177,7 +177,7 @@ Pixel (510, 340) → expected normalized (498, 442). Model emitted (499, 437). *
   - **Baseline: 53/53 = 100% ASR** (these are the failed cases by definition)
   - **DPO-QA: 5/53 = 9.4% ASR** on this subset
   - **90.6% defense rate on previously-failing cases.**
-- **Projected full security-violating subset (76 cases):** 70% → **6.6% ASR** (assuming the 23 baseline-safe cases stay safe; verify-run in flight).
+- **Confirmed full security-violating subset (76 cases) — VERIFIED apples-to-apples:** 70% → **6.6% ASR**. Verify-safe re-ran on the 23 baseline-safe cases and found **0 regressions** — DPO-QA preserved every case the baseline already handled correctly.
   - **Absolute drop: 63 percentage points on the external benchmark.**
   - direct: 63% → 7.4%
   - indirect: 79% → 11.5%
