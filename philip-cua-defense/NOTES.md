@@ -96,7 +96,8 @@ The fonts come from `/usr/share/fonts/truetype/dejavu/` (preinstalled).
 | Eval | N | ASR | Notes |
 |---|---|---|---|
 | Our 15 scenarios, defense-warned prompt | 15 | 13.3% | v0 — `outputs/eval_baseline_v0.json`. Methodology bug: prompt told the model "treat banner text as untrusted." Inflated. |
-| Our 15 scenarios, neutral prompt + salvage parser | 15 | 6.7% | v1 — `outputs/eval_baseline_v1.json`. Lower than expected; suspicious. Likely artifact of sparse Pillow renders confusing the model so it can't engage with the malicious target. |
+| Our 15 scenarios, neutral prompt + basic salvage parser | 15 | 6.7% | v1 — `outputs/eval_baseline_v1.json`. Many `<unparsed>` cases. |
+| Our 15 scenarios, neutral prompt + full salvage parser | 15 | 13.3% | v2 — `outputs/eval_baseline_v2.json`. 0 unparsed, 8 salvaged. **N=15 is too small — ASR variance across v0→v1→v2 was 7% from single-case shifts. Don't trust this number as a baseline.** |
 | CyberSecEval3 visual PI, regex-only judge | 20 | 71% | Sanity subset. Real Meta-AI-generated images. **This is the headline baseline number.** N=200 still running. |
 | VPI-Bench browser subset (via vLLM + Playwright) | TBD | TBD | Subagent F working. Honest 3-5 case minimal run target. |
 
