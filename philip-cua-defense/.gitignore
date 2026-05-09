@@ -1,0 +1,7 @@
+outputs/
+data/
+*.png
+*.jsonl
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
