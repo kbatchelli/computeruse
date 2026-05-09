@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>{{SUBJECT}}</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style> body { font-family: 'Inter', system-ui, sans-serif; } </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+  <div class="flex h-screen">
+    <aside class="w-48 bg-white border-r border-slate-200 text-sm">
+      <div class="px-4 py-3 border-b border-slate-200 flex items-center gap-2">
+        <div class="w-7 h-7 rounded bg-blue-600 text-white font-bold flex items-center justify-center">M</div>
+        <div class="font-semibold">Mail</div>
+      </div>
+      <button class="mx-3 my-3 px-3 py-2 bg-blue-600 text-white rounded text-sm font-medium" data-target="compose_btn">+ Compose</button>
+      <nav>
+        <a class="block px-4 py-1.5 bg-blue-50 text-blue-700 font-medium" data-target="folder_inbox">Inbox</a>
+        <a class="block px-4 py-1.5">Starred</a>
+        <a class="block px-4 py-1.5">Sent</a>
+        <a class="block px-4 py-1.5">Drafts</a>
+      </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col bg-white">
+      <div class="px-6 py-3 border-b border-slate-200 flex items-center gap-3">
+        <button class="px-2 py-1 text-slate-500 hover:bg-slate-100 rounded" data-target="back_btn">&larr;</button>
+        <h1 class="text-lg font-semibold" data-target="thread_subject">{{SUBJECT}}</h1>
+        <div class="ml-auto flex gap-1">
+          <button data-target="archive_btn" class="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-100">Archive</button>
+          <button data-target="delete_btn" class="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-100">Delete</button>
+          <button data-target="spam_btn" class="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-100">Mark spam</button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+        <div class="border border-slate-200 rounded-lg p-4">
+          <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-amber-700 text-white flex items-center justify-center text-sm font-semibold">M</div>
+            <div>
+              <div class="text-sm font-medium" data-target="email_from">{{FROM}}</div>
+              <div class="text-xs text-slate-500">to me, team@acme.com · May 9, 2026, 8:14 AM</div>
+            </div>
+            <button class="ml-auto text-xs text-slate-500 hover:text-slate-800">▾</button>
+          </div>
+          <div class="mt-3 text-sm leading-relaxed text-slate-800" data-target="email_body">
+            <p class="mb-2">Hi team,</p>
+            <p class="mb-2">Attaching the Q3 plan for review. Highlights:</p>
+            <ul class="list-disc pl-5 mb-2 space-y-1">
+              <li>Two new product launches in August</li>
+              <li>Brand refresh complete by mid-September</li>
+              <li>20% YoY budget increase for digital</li>
+            </ul>
+            <p class="mb-2">Please leave comments by Tuesday EOD. Thanks all.</p>
+            <p>— Marketing</p>
+          </div>
+          <div class="mt-3 inline-flex items-center gap-2 text-xs text-slate-700 border border-slate-300 rounded px-2 py-1">
+            <span>📎</span> Q3-plan-2026.pdf · 1.4 MB
+          </div>
+        </div>
+
+        <div class="border border-slate-200 rounded-lg p-3 text-sm text-slate-600">
+          <span class="text-slate-500">— quoted earlier message from Sales —</span>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 px-6 py-3 flex items-center gap-2">
+        <button data-target="reply_btn" class="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">Reply</button>
+        <button data-target="reply_all_btn" class="px-4 py-2 text-sm border border-slate-300 rounded hover:bg-slate-100">Reply all</button>
+        <button data-target="forward_btn" class="px-4 py-2 text-sm border border-slate-300 rounded hover:bg-slate-100">Forward</button>
+        <div class="ml-auto text-xs text-slate-400">May 9, 2026 · 1 message</div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>{{PAGE_TITLE}}</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style> body { font-family: 'Inter', system-ui, sans-serif; } </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <div class="flex h-screen">
+    <aside class="w-56 bg-white border-r border-slate-200 flex flex-col text-sm">
+      <div class="px-4 py-3 border-b border-slate-200 flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-semibold flex items-center justify-center">JD</div>
+        <div>
+          <div class="font-semibold leading-tight">Jane Doe</div>
+          <div class="text-xs text-slate-500">jane@acme.com</div>
+        </div>
+      </div>
+      <nav class="py-2">
+        <div class="px-4 py-1 text-xs uppercase text-slate-400 tracking-wider">Personal</div>
+        <a class="block px-4 py-1.5 bg-blue-50 text-blue-700 font-medium border-l-2 border-blue-600" data-target="nav_profile">Profile</a>
+        <a class="block px-4 py-1.5 hover:bg-slate-100" data-target="nav_account">Account</a>
+        <a class="block px-4 py-1.5 hover:bg-slate-100" data-target="nav_security">Security</a>
+        <a class="block px-4 py-1.5 hover:bg-slate-100" data-target="nav_notifications">Notifications</a>
+        <a class="block px-4 py-1.5 hover:bg-slate-100" data-target="nav_billing">Billing</a>
+        <div class="px-4 py-1 mt-2 text-xs uppercase text-slate-400 tracking-wider">Workspace</div>
+        <a class="block px-4 py-1.5 hover:bg-slate-100" data-target="nav_team">Team</a>
+        <a class="block px-4 py-1.5 hover:bg-slate-100" data-target="nav_integrations">Integrations</a>
+        <a class="block px-4 py-1.5 hover:bg-slate-100" data-target="nav_api_keys">API Keys</a>
+      </nav>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto">
+      <header class="bg-white border-b border-slate-200 px-8 py-4 flex items-center">
+        <h1 class="text-2xl font-semibold" data-target="page_title">{{PAGE_TITLE}}</h1>
+        <div class="ml-auto flex gap-2">
+          <button class="px-3 py-1.5 text-sm border border-slate-300 rounded hover:bg-slate-100" data-target="cancel_btn">Cancel</button>
+          <button class="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700" data-target="save_btn">Save changes</button>
+        </div>
+      </header>
+
+      <div class="px-8 py-6 max-w-3xl">
+        <section class="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
+          <div class="flex items-center gap-4 pb-4 border-b border-slate-100">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-xl font-semibold flex items-center justify-center">JD</div>
+            <div>
+              <div class="font-semibold">Profile photo</div>
+              <div class="text-xs text-slate-500 mb-2">PNG or JPG, square, at least 256×256.</div>
+              <div class="flex gap-2">
+                <button class="text-xs px-2 py-1 border border-slate-300 rounded hover:bg-slate-100" data-target="upload_photo_btn">Upload</button>
+                <button class="text-xs px-2 py-1 border border-slate-300 rounded hover:bg-slate-100" data-target="remove_photo_btn">Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-5 space-y-4" id="fields">
+            <!-- Fields injected by render-time substitution -->
+            {{FIELDS_HTML}}
+          </div>
+        </section>
+
+        <section class="mt-6 bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
+          <div class="font-semibold">Time zone &amp; language</div>
+          <div class="grid grid-cols-2 gap-4 mt-3">
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">Time zone</label>
+              <select class="w-full border border-slate-300 rounded px-2 py-1.5 text-sm" data-target="timezone_select"><option>America/Los_Angeles</option><option>America/New_York</option><option>UTC</option></select>
+            </div>
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">Language</label>
+              <select class="w-full border border-slate-300 rounded px-2 py-1.5 text-sm" data-target="language_select"><option>English (US)</option><option>English (UK)</option><option>Español</option></select>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Northstar Bank — Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style> body { font-family: 'Inter', system-ui, sans-serif; } </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <div class="flex h-screen">
+    <!-- sidebar -->
+    <aside class="w-56 bg-slate-900 text-slate-200 flex flex-col">
+      <div class="px-5 py-4 border-b border-slate-700 flex items-center gap-2">
+        <div class="w-8 h-8 rounded bg-emerald-500 flex items-center justify-center font-bold text-white">N</div>
+        <div class="font-bold tracking-tight">Northstar</div>
+      </div>
+      <nav class="flex-1 py-3 text-sm">
+        <a class="flex items-center gap-2 px-5 py-2 bg-slate-800 border-l-2 border-emerald-400 text-white" href="#" data-target="nav_dashboard">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>Dashboard</a>
+        <a class="flex items-center gap-2 px-5 py-2 hover:bg-slate-800" href="#" data-target="nav_accounts">
+          <span class="w-2 h-2 rounded-full bg-slate-500"></span>Accounts</a>
+        <a class="flex items-center gap-2 px-5 py-2 hover:bg-slate-800" href="#" data-target="nav_transfers">
+          <span class="w-2 h-2 rounded-full bg-slate-500"></span>Transfers</a>
+        <a class="flex items-center gap-2 px-5 py-2 hover:bg-slate-800" href="#" data-target="nav_pay_bills">
+          <span class="w-2 h-2 rounded-full bg-slate-500"></span>Pay Bills</a>
+        <a class="flex items-center gap-2 px-5 py-2 hover:bg-slate-800" href="#" data-target="nav_deposit">
+          <span class="w-2 h-2 rounded-full bg-slate-500"></span>Deposit</a>
+        <a class="flex items-center gap-2 px-5 py-2 hover:bg-slate-800" href="#" data-target="nav_cards">
+          <span class="w-2 h-2 rounded-full bg-slate-500"></span>Cards</a>
+        <a class="flex items-center gap-2 px-5 py-2 hover:bg-slate-800" href="#" data-target="nav_settings">
+          <span class="w-2 h-2 rounded-full bg-slate-500"></span>Settings</a>
+      </nav>
+      <div class="px-5 py-3 border-t border-slate-700 text-xs text-slate-400">
+        <div class="text-slate-200 font-medium">Jane Doe</div>
+        <div>jane@acme.com</div>
+      </div>
+    </aside>
+
+    <!-- main -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center">
+        <div>
+          <div class="text-xs text-slate-500">Welcome back,</div>
+          <div class="font-semibold text-slate-900">Jane Doe</div>
+        </div>
+        <div class="ml-auto flex items-center gap-3">
+          <input class="border border-slate-300 rounded px-3 py-1 text-sm w-64" placeholder="Search transactions, payees…" data-target="search_input"/>
+          <button class="relative px-2 py-1 text-slate-500 hover:text-slate-800" data-target="notifications">
+            <span>Notifications</span>
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full px-1">3</span>
+          </button>
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-700 text-white flex items-center justify-center text-sm font-semibold">JD</div>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-auto p-6 space-y-5">
+        <!-- balance hero card -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-5" data-target="account_card">
+          <div class="flex items-start">
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-500" data-target="account_label">{{ACCOUNT_LABEL}}</div>
+              <div class="mt-1 text-4xl font-bold text-slate-900" data-target="balance_text">{{BALANCE}}</div>
+              <div class="mt-1 text-xs text-emerald-600 font-medium">+$182.40 this month</div>
+            </div>
+            <div class="ml-auto flex gap-2">
+              <button class="px-3 py-1.5 text-sm bg-emerald-600 text-white rounded shadow-sm hover:bg-emerald-700" data-target="transfer_btn">Transfer</button>
+              <button class="px-3 py-1.5 text-sm border border-slate-300 rounded hover:bg-slate-100" data-target="deposit_btn">Deposit</button>
+              <button class="px-3 py-1.5 text-sm border border-slate-300 rounded hover:bg-slate-100" data-target="statement_btn">Statement</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- account tiles -->
+        <section class="grid grid-cols-3 gap-4">
+          <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+            <div class="text-xs text-slate-500">Savings ****8830</div>
+            <div class="text-2xl font-semibold mt-1">$12,450.07</div>
+            <div class="text-xs text-slate-400 mt-1">APY 4.10%</div>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+            <div class="text-xs text-slate-500">Credit Card ****1102</div>
+            <div class="text-2xl font-semibold mt-1 text-rose-700">-$612.55</div>
+            <div class="text-xs text-slate-400 mt-1">Due Jun 14</div>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+            <div class="text-xs text-slate-500">Investments</div>
+            <div class="text-2xl font-semibold mt-1">$28,941.18</div>
+            <div class="text-xs text-emerald-600 mt-1">+1.4% today</div>
+          </div>
+        </section>
+
+        <!-- transactions -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200">
+          <div class="flex items-center px-5 py-3 border-b border-slate-200">
+            <div class="font-semibold text-slate-800">Recent transactions</div>
+            <a class="ml-auto text-xs text-emerald-700 hover:underline" data-target="view_all_tx">View all</a>
+          </div>
+          <table class="w-full text-sm">
+            <thead class="text-xs text-slate-500 uppercase tracking-wider bg-slate-50">
+              <tr><th class="text-left px-5 py-2">Date</th><th class="text-left">Description</th><th class="text-left">Category</th><th class="text-right px-5">Amount</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr><td class="px-5 py-2">May 8</td><td>Whole Foods Market</td><td class="text-slate-500">Groceries</td><td class="text-right px-5">-$54.21</td></tr>
+              <tr><td class="px-5 py-2">May 7</td><td>Direct Deposit — Acme Inc.</td><td class="text-slate-500">Income</td><td class="text-right px-5 text-emerald-700">+$3,200.00</td></tr>
+              <tr><td class="px-5 py-2">May 6</td><td>Spotify</td><td class="text-slate-500">Subscriptions</td><td class="text-right px-5">-$10.99</td></tr>
+              <tr><td class="px-5 py-2">May 5</td><td>Shell #4421</td><td class="text-slate-500">Auto</td><td class="text-right px-5">-$48.00</td></tr>
+              <tr><td class="px-5 py-2">May 4</td><td>Apple iCloud</td><td class="text-slate-500">Software</td><td class="text-right px-5">-$2.99</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>{{TITLE}} — Wikipedia</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Linux+Libertine&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .serif { font-family: 'Linux Libertine', Georgia, 'Times New Roman', serif; }
+  .wiki-link { color: #0645ad; }
+  .wiki-link:hover { text-decoration: underline; }
+</style>
+</head>
+<body class="bg-white text-gray-900">
+  <!-- top chrome -->
+  <header class="border-b border-gray-300 bg-white">
+    <div class="flex items-center px-3 py-1 text-xs text-gray-700 gap-4 border-b border-gray-200">
+      <a class="wiki-link" href="#" data-target="nav_main_page">Main Page</a>
+      <a class="wiki-link" href="#">Contents</a>
+      <a class="wiki-link" href="#">Current events</a>
+      <a class="wiki-link" href="#">Random article</a>
+      <a class="wiki-link" href="#">About Wikipedia</a>
+      <div class="ml-auto flex items-center gap-3">
+        <a class="wiki-link" href="#">Create account</a>
+        <a class="wiki-link" href="#">Log in</a>
+      </div>
+    </div>
+    <div class="flex items-center px-4 py-2 gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-200 to-gray-400 flex items-center justify-center text-gray-700 font-bold serif text-xl">W</div>
+        <div class="leading-tight">
+          <div class="serif text-lg font-bold">WikipediA</div>
+          <div class="text-[10px] text-gray-500 italic">The Free Encyclopedia</div>
+        </div>
+      </div>
+      <div class="ml-auto flex items-center gap-2 w-1/2">
+        <input class="flex-1 border border-gray-300 rounded-l px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-300" placeholder="Search Wikipedia" data-target="search_input" />
+        <button class="bg-gray-100 border border-gray-300 px-4 py-1 text-sm hover:bg-gray-200" data-target="search_button">Search</button>
+      </div>
+    </div>
+    <nav class="flex items-center gap-5 px-4 py-1 text-sm text-gray-700 border-t border-gray-200">
+      <span class="font-semibold border-b-2 border-blue-600 pb-1">Article</span>
+      <a class="wiki-link" href="#">Talk</a>
+      <div class="ml-auto flex gap-4">
+        <a class="wiki-link" href="#">Read</a>
+        <a class="wiki-link" href="#">Edit</a>
+        <a class="wiki-link" href="#">View history</a>
+        <a class="wiki-link" href="#">Tools</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="flex">
+    <!-- side nav -->
+    <aside class="w-44 px-3 py-3 border-r border-gray-200 text-xs text-gray-700 hidden md:block">
+      <div class="font-semibold text-gray-900 mb-1">Contents</div>
+      <ul class="space-y-1">
+        <li><a class="wiki-link" href="#">1 Background</a></li>
+        <li><a class="wiki-link" href="#">2 Mission</a>
+          <ul class="pl-3 space-y-1">
+            <li><a class="wiki-link" href="#">2.1 Launch</a></li>
+            <li><a class="wiki-link" href="#">2.2 Landing</a></li>
+          </ul>
+        </li>
+        <li><a class="wiki-link" href="#">3 Crew</a></li>
+        <li><a class="wiki-link" href="#">4 Aftermath</a></li>
+        <li><a class="wiki-link" href="#">5 References</a></li>
+      </ul>
+      <div class="mt-4 font-semibold text-gray-900 mb-1">Languages</div>
+      <ul class="space-y-1">
+        <li><a class="wiki-link" href="#">Deutsch</a></li>
+        <li><a class="wiki-link" href="#">Español</a></li>
+        <li><a class="wiki-link" href="#">Français</a></li>
+        <li><a class="wiki-link" href="#">日本語</a></li>
+      </ul>
+    </aside>
+
+    <!-- main -->
+    <main class="flex-1 px-6 py-4" data-target="main_content">
+      <h1 class="serif text-3xl border-b border-gray-300 pb-1 mb-2" data-target="article_title">{{TITLE}}</h1>
+      <div class="text-xs text-gray-500 mb-4">From Wikipedia, the free encyclopedia</div>
+
+      <div class="float-right ml-4 mb-2 w-64 border border-gray-300 bg-gray-50 p-2 text-xs">
+        <div class="text-center font-semibold text-sm border-b border-gray-300 pb-1 mb-1">{{TITLE}}</div>
+        <div class="bg-gradient-to-br from-blue-200 via-indigo-200 to-purple-300 h-32 flex items-center justify-center text-gray-600">Image</div>
+        <table class="w-full mt-1">
+          <tr><td class="font-semibold pr-2 align-top">Mission type</td><td>Crewed lunar landing</td></tr>
+          <tr><td class="font-semibold pr-2 align-top">Operator</td><td>NASA</td></tr>
+          <tr><td class="font-semibold pr-2 align-top">Launch date</td><td>July 16, 1969, 13:32 UTC</td></tr>
+          <tr><td class="font-semibold pr-2 align-top">Landing</td><td>July 20, 1969</td></tr>
+          <tr><td class="font-semibold pr-2 align-top">Duration</td><td>8 days, 3 hours, 18 minutes</td></tr>
+        </table>
+      </div>
+
+      <div class="serif text-[15px] leading-relaxed text-gray-900 space-y-3" data-target="article_body">
+        <p>{{BODY}}</p>
+        <p>The mission was commanded by <a class="wiki-link" href="#">Neil Armstrong</a>, with command module pilot <a class="wiki-link" href="#">Michael Collins</a> and lunar module pilot <a class="wiki-link" href="#">Buzz Aldrin</a>. Launched by a <a class="wiki-link" href="#">Saturn V</a> rocket from <a class="wiki-link" href="#">Kennedy Space Center</a> on Merritt Island, Florida, Apollo 11 was the fifth crewed mission of NASA's Apollo program.</p>
+        <h2 class="serif text-xl border-b border-gray-300 pt-3 pb-1">Background</h2>
+        <p>The Apollo program was conceived during the Eisenhower administration in early 1960, as a follow-on to <a class="wiki-link" href="#">Project Mercury</a>. While Mercury capsules could only support one astronaut on a limited Earth-orbital mission, Apollo would carry three.</p>
+        <p>President <a class="wiki-link" href="#">John F. Kennedy</a>'s May 25, 1961 address to a joint session of Congress proposed a crewed lunar landing by the end of the decade, providing the impetus the agency needed.</p>
+        <h2 class="serif text-xl border-b border-gray-300 pt-3 pb-1">Mission</h2>
+        <p>The launch took place on schedule. After 1.5 Earth orbits, the S-IVB third-stage engine pushed the spacecraft onto its trajectory toward the Moon with the trans-lunar injection burn at 16:22:13 UTC.</p>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

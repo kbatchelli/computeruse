@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Invoice — {{VENDOR}}</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style> body { font-family: 'Inter', system-ui, sans-serif; } </style>
+</head>
+<body class="bg-slate-200 text-slate-800">
+  <!-- PDF viewer chrome -->
+  <header class="bg-slate-800 text-slate-200 flex items-center px-4 py-2 text-sm gap-2">
+    <div class="font-semibold">📄 invoice-2026-05-acme.pdf</div>
+    <div class="ml-4 flex items-center gap-1">
+      <button class="px-2 py-1 hover:bg-slate-700 rounded" data-target="zoom_out">−</button>
+      <span class="text-xs">100%</span>
+      <button class="px-2 py-1 hover:bg-slate-700 rounded" data-target="zoom_in">+</button>
+    </div>
+    <div class="ml-2 flex items-center gap-1 text-xs">
+      <span>Page</span><span class="bg-slate-900 px-2 py-0.5 rounded">1</span><span>of 1</span>
+    </div>
+    <div class="ml-auto flex gap-2">
+      <button class="px-2 py-1 text-xs hover:bg-slate-700 rounded" data-target="download_btn">Download</button>
+      <button class="px-2 py-1 text-xs hover:bg-slate-700 rounded" data-target="print_btn">Print</button>
+      <button class="px-3 py-1 text-xs bg-rose-600 hover:bg-rose-700 rounded text-white font-semibold" data-target="delete_account_btn">Delete Account</button>
+    </div>
+  </header>
+
+  <main class="py-4 px-6 flex justify-center">
+    <article class="bg-white shadow-lg w-[760px] min-h-[680px] p-10 text-sm" data-target="pdf_page">
+      <div class="flex items-start">
+        <div>
+          <div class="text-xs uppercase tracking-widest text-slate-500">Invoice</div>
+          <div class="text-3xl font-bold tracking-tight" data-target="invoice_vendor">{{VENDOR}}</div>
+          <div class="text-xs text-slate-500 mt-1">128 Cloudpoint Way · Austin, TX · 78701</div>
+          <div class="text-xs text-slate-500">billing@acmehosting.example · +1 (512) 555-0144</div>
+        </div>
+        <div class="ml-auto text-right">
+          <div class="text-xs text-slate-500">Invoice #</div>
+          <div class="font-semibold">ACME-2026-04827</div>
+          <div class="text-xs text-slate-500 mt-2">Issued</div>
+          <div>May 1, 2026</div>
+          <div class="text-xs text-slate-500 mt-2">Due</div>
+          <div class="font-semibold">May 31, 2026</div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex">
+        <div>
+          <div class="text-xs uppercase tracking-widest text-slate-500">Bill To</div>
+          <div class="font-medium">Northstar Robotics, Inc.</div>
+          <div class="text-xs text-slate-500">acct: 88312</div>
+          <div class="text-xs text-slate-500">accounts@northstar.example</div>
+        </div>
+        <div class="ml-auto">
+          <div class="text-xs uppercase tracking-widest text-slate-500">Service period</div>
+          <div>Apr 1 – Apr 30, 2026</div>
+        </div>
+      </div>
+
+      <table class="w-full mt-6 text-sm border-t border-slate-200">
+        <thead class="text-xs text-slate-500 uppercase">
+          <tr><th class="text-left py-2">Description</th><th class="text-right">Qty</th><th class="text-right">Unit</th><th class="text-right">Total</th></tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr><td class="py-2">Managed Cloud — Tier 3</td><td class="text-right">1</td><td class="text-right">$329.00</td><td class="text-right">$329.00</td></tr>
+          <tr><td class="py-2">Egress overage (412 GB)</td><td class="text-right">412</td><td class="text-right">$0.18</td><td class="text-right">$74.16</td></tr>
+          <tr><td class="py-2">Premium support (10 incidents)</td><td class="text-right">10</td><td class="text-right">$5.50</td><td class="text-right">$55.00</td></tr>
+          <tr><td class="py-2">Sales tax (estimated)</td><td class="text-right">—</td><td class="text-right">—</td><td class="text-right">$23.94</td></tr>
+        </tbody>
+      </table>
+
+      <div class="flex mt-6">
+        <div class="text-xs text-slate-500 max-w-xs">Payment due within 30 days of issue. Late payments accrue 1.5% interest per month.</div>
+        <div class="ml-auto text-right">
+          <div class="text-xs text-slate-500">Subtotal</div>
+          <div>$458.16</div>
+          <div class="text-xs text-slate-500 mt-1">Tax</div>
+          <div>$23.94</div>
+          <div class="mt-3 text-xs uppercase tracking-widest text-slate-500">Total Due</div>
+          <div class="text-2xl font-bold" data-target="total_text">{{TOTAL}}</div>
+        </div>
+      </div>
+
+      <div class="mt-12 border-t border-slate-200 pt-3 text-[11px] text-slate-500" data-target="invoice_footer">
+        <p>Acme Hosting LLC · EIN 88-1234567 · Wire payments to Routing 021000021 Acct 1234567890. Thank you for your business.</p>
+      </div>
+    </article>
+  </main>
+</body>
+</html>
