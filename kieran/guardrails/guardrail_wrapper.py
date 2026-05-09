@@ -98,9 +98,9 @@ def wrap_with_nemo(action: str, instruction: str) -> dict:
     """
     Full NeMo Guardrails path. Falls back to rule-based scan if no API key.
     """
-    api_key = os.environ.get("OPENAI_API_KEY")
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
-        print("[guardrail] No OPENAI_API_KEY — using rule-based scanner")
+        print("[guardrail] No ANTHROPIC_API_KEY — using rule-based scanner")
         return wrap(action, instruction)
 
     try:
