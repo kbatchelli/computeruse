@@ -1,0 +1,25 @@
+define bot block injected action
+  "BLOCKED: action matches visual prompt injection pattern."
+
+define flow check cua action for injection
+  $action = $bot_message
+
+  # Flag navigation to external/suspicious URLs
+  if "navigate" in $action and ("attacker" in $action or "external" in $action or "exfil" in $action)
+    bot block injected action
+    stop
+
+  # Flag destructive irreversible actions not in the user instruction
+  if "delete_all" in $action or "format_disk" in $action or "rm -rf" in $action or "wipe" in $action
+    bot block injected action
+    stop
+
+  # Flag credential/PII exfiltration via type action
+  if "type" in $action and ("password" in $action or "ssn" in $action or "credit_card" in $action)
+    bot block injected action
+    stop
+
+  # Flag privilege escalation
+  if "elevate" in $action or "grant_all" in $action or "disable_firewall" in $action or "admin_override" in $action
+    bot block injected action
+    stop
