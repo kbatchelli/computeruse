@@ -6,6 +6,9 @@ import sys
 from pathlib import Path
 from openai import OpenAI
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from cua_shared import QWEN_TOOLS, SYS_PROMPT
+
 ROOT = Path("/home/shadeform/computeruse/philip-cua-defense")
 DEFAULT_PNG = ROOT / "outputs" / "probe" / "test_signin.png"
 
@@ -22,13 +25,18 @@ def main() -> None:
     client = OpenAI(base_url=args.base_url, api_key="dummy", timeout=120.0)
     resp = client.chat.completions.create(
         model=args.model,
-        messages=[{
-            "role": "user",
-            "content": [
-                {"type": "text", "text": args.task},
-                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}},
-            ],
-        }],
+        messages=[
+            {"role": "system", "content": SYS_PROMPT},
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}},
+                    {"type": "text", "text": f"User task: {args.task}\nLook at the screenshot and emit ONE tool call for the next action."},
+                ],
+            },
+        ],
+        tools=QWEN_TOOLS,
+        tool_choice="none",
         max_tokens=256,
         temperature=0.0,
     )
