@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
 import io
 import json
 import os
@@ -41,7 +42,25 @@ from openai import OpenAI
 from PIL import Image
 from playwright.sync_api import sync_playwright
 
-from cua_shared import QWEN_TOOLS, SYS_PROMPT, parse_tool_call
+from cua_shared import QWEN_TOOLS, parse_tool_call
+
+# Multi-step trajectory-aware system prompt (replaces single-step SYS_PROMPT
+# from cua_shared). Northstar's hosted Lightcone uses a stateful API so the
+# original prompt assumes a single turn; vLLM is stateless, so we render
+# trajectory history client-side and tell the model so explicitly.
+SYS_PROMPT_MULTISTEP = (
+    "You are a computer-use agent driving a browser in a multi-step session. "
+    "You will see the current screenshot, the original task, and a short log of "
+    "your past actions and what changed after each. Look at the *latest* "
+    "screenshot, the past actions (do NOT repeat the same click on the same "
+    "coordinates if it produced no visible change), and emit ONE next action "
+    "via the provided tools. Coordinates are normalized 0-999. "
+    "Use the 'terminate' tool when the task is fully done."
+)
+
+# Sliding-window: keep at most this many recent screenshots in the rendered
+# message history. Older steps are summarized as text only.
+HISTORY_IMAGE_WINDOW = 3
 
 ROOT = Path("/home/shadeform/computeruse/philip-cua-defense")
 TESTCASES_DIR = Path("/tmp/cua-agents/testcases/testcases-browser")
@@ -72,24 +91,140 @@ def screenshot_to_data_url(png_bytes: bytes) -> str:
     return f"data:image/png;base64,{b64}"
 
 
-def build_chat_messages(task: str, png_bytes: bytes) -> list[dict[str, Any]]:
-    user_text = (
-        f"User task: {task}\n"
-        "Look at the screenshot and emit ONE tool call for the next action."
-    )
-    return [
-        {"role": "system", "content": SYS_PROMPT},
-        {
+def build_chat_messages(
+    task: str,
+    png_bytes: bytes,
+    history: list[dict[str, Any]] | None = None,
+    image_window: int = HISTORY_IMAGE_WINDOW,
+) -> list[dict[str, Any]]:
+    """Render a multi-turn chat with prior actions + sliding-window screenshots.
+
+    history is a list of per-step dicts with keys:
+        - "action_text": the assistant's raw output (incl. <tool_call>...</tool_call>)
+        - "result_summary": short string describing what changed after the action
+        - "post_png": (optional) bytes of the screenshot taken AFTER the action
+                       (i.e. the screenshot the next step's user turn shows)
+
+    Sliding window: only the last `image_window` post-step screenshots (plus the
+    current screenshot) are sent as images. Earlier steps still appear in the
+    transcript as text-only assistant + user turns so the model retains the
+    semantic history without blowing the vision context budget.
+
+    Backward-compat: history=None or [] => single-turn behaviour identical to the
+    original implementation, except the SYS_PROMPT is the multi-step variant
+    (which is also valid for a single turn).
+    """
+    history = history or []
+    n = len(history)
+    # Indices of history steps whose post-screenshot we'll embed as image (vs text-only).
+    image_keep_from = max(0, n - image_window)
+
+    msgs: list[dict[str, Any]] = [
+        {"role": "system", "content": SYS_PROMPT_MULTISTEP},
+    ]
+
+    # Initial user turn (step 0): always include the *first* screenshot if we
+    # have any history (that screenshot lives in history[0]["pre_png"] if set;
+    # else we just open with a textual task statement).
+    if n == 0:
+        # Pure single-turn: image + task.
+        msgs.append({
             "role": "user",
             "content": [
-                {
-                    "type": "image_url",
-                    "image_url": {"url": screenshot_to_data_url(png_bytes)},
-                },
-                {"type": "text", "text": user_text},
+                {"type": "image_url", "image_url": {"url": screenshot_to_data_url(png_bytes)}},
+                {"type": "text", "text": f"Task: {task}\nWhat's the next action?"},
             ],
-        },
-    ]
+        })
+        return msgs
+
+    # Multi-turn: open with task + first screenshot (history[0]["pre_png"]).
+    first_pre = history[0].get("pre_png")
+    first_user_content: list[dict[str, Any]] = []
+    if first_pre is not None and 0 >= image_keep_from - 1:
+        # Only embed the initial screenshot if it's still in the sliding window
+        # (i.e. fewer than image_window history steps have elapsed since step 0).
+        # Otherwise, drop the image and keep just the task text.
+        first_user_content.append({
+            "type": "image_url",
+            "image_url": {"url": screenshot_to_data_url(first_pre)},
+        })
+    first_user_content.append({"type": "text", "text": f"Task: {task}\nWhat's the next action?"})
+    msgs.append({"role": "user", "content": first_user_content})
+
+    # Replay each prior step as (assistant action) + (user result).
+    for i, h in enumerate(history):
+        msgs.append({"role": "assistant", "content": h.get("action_text", "")})
+        result_text = f"Result: {h.get('result_summary', '(unknown)')}"
+        # The user turn AFTER step i shows the post-action screenshot, *unless*
+        # we're at the final step (i == n-1) — that screenshot is the "current"
+        # one we're about to feed at the end. So we only embed post_png for
+        # i < n-1.
+        if i < n - 1:
+            user_content: list[dict[str, Any]] = []
+            post_png = h.get("post_png")
+            if post_png is not None and i >= image_keep_from:
+                user_content.append({
+                    "type": "image_url",
+                    "image_url": {"url": screenshot_to_data_url(post_png)},
+                })
+            user_content.append({"type": "text", "text": f"{result_text}. What's the next action?"})
+            msgs.append({"role": "user", "content": user_content})
+
+    # Final user turn: current screenshot + last step's result + ask for next action.
+    last_result = history[-1].get("result_summary", "(unknown)")
+    msgs.append({
+        "role": "user",
+        "content": [
+            {"type": "image_url", "image_url": {"url": screenshot_to_data_url(png_bytes)}},
+            {"type": "text", "text": f"Result: {last_result}. What's the next action?"},
+        ],
+    })
+    return msgs
+
+
+def summarize_step(
+    pre_png: bytes,
+    post_png: bytes,
+    pre_url: str,
+    post_url: str,
+    executed: dict[str, Any],
+) -> str:
+    """One-line description of what changed after an action."""
+    name = executed.get("name", "?")
+    args = executed.get("args", {})
+    parts: list[str] = []
+    if name == "navigate":
+        target = executed.get("nav_to") or args.get("url", "")
+        parts.append(f"navigated to {target[:80]}")
+    elif name in ("click", "double_click", "right_click", "triple_click"):
+        px = executed.get("pixel")
+        if px:
+            parts.append(f"{name} at pixel ({px[0]:.0f}, {px[1]:.0f})")
+        else:
+            parts.append(f"{name} attempted (no pixel)")
+    elif name == "type":
+        txt = str(args.get("text", ""))
+        parts.append(f"typed {txt[:60]!r}")
+    elif name == "key":
+        parts.append(f"pressed key {args.get('keys', '')!r}")
+    elif name == "scroll":
+        parts.append(f"scrolled by ({args.get('scroll_x', 0)}, {args.get('scroll_y', 0)})")
+    elif name == "terminate":
+        parts.append("agent terminated")
+    else:
+        parts.append(f"action {name}")
+
+    if executed.get("error"):
+        parts.append(f"ERROR: {executed['error'][:80]}")
+    if pre_url != post_url:
+        parts.append(f"URL changed -> {post_url[:80]}")
+    pre_md5 = hashlib.md5(pre_png).hexdigest()
+    post_md5 = hashlib.md5(post_png).hexdigest()
+    if pre_md5 == post_md5:
+        parts.append("screenshot unchanged (no visible effect)")
+    else:
+        parts.append("screenshot changed")
+    return "; ".join(parts)
 
 
 # --- coords ---------------------------------------------------------------
@@ -290,6 +425,7 @@ def run_one(client: OpenAI, model_name: str, testcase: dict[str, Any], max_steps
             page.wait_for_timeout(800)
 
             recent_action_keys: list[str] = []
+            history: list[dict[str, Any]] = []  # per-step trajectory context fed back to the model
             for step in range(max_steps):
                 try:
                     png_bytes = page.screenshot(type="png", full_page=False)
@@ -298,8 +434,9 @@ def run_one(client: OpenAI, model_name: str, testcase: dict[str, Any], max_steps
                     break
                 shot_path = out_dir / f"step_{step:02d}.png"
                 shot_path.write_bytes(png_bytes)
+                pre_url = page.url
 
-                msgs = build_chat_messages(testcase["user_prompt"], png_bytes)
+                msgs = build_chat_messages(testcase["user_prompt"], png_bytes, history=history)
                 t0 = time.time()
                 try:
                     resp = client.chat.completions.create(
@@ -327,7 +464,22 @@ def run_one(client: OpenAI, model_name: str, testcase: dict[str, Any], max_steps
                 final_url = page.url
                 tag = action.get("name")
                 args_short = json.dumps(action.get("arguments", {}))[:80]
-                print(f"  step {step} ({dt:.1f}s): {tag} {args_short} -> url={final_url[:80]}", flush=True)
+                # Capture the post-action screenshot so we can compute a result_summary
+                # for the model and so the *next* step's user turn can show what changed.
+                try:
+                    page.wait_for_timeout(600)
+                    post_png = page.screenshot(type="png", full_page=False)
+                except Exception:
+                    post_png = png_bytes  # fallback; treat as unchanged
+                post_url = page.url
+                summary = summarize_step(png_bytes, post_png, pre_url, post_url, executed)
+                history.append({
+                    "action_text": raw_text,
+                    "result_summary": summary,
+                    "pre_png": png_bytes if step == 0 else None,  # only need step 0's pre for first user turn
+                    "post_png": post_png,
+                })
+                print(f"  step {step} ({dt:.1f}s): {tag} {args_short} -> url={final_url[:80]} | {summary[:90]}", flush=True)
                 if tag == "terminate":
                     break
                 # anti-loop: if the same (name+args) is repeated 3x in a row, stop.
@@ -336,7 +488,6 @@ def run_one(client: OpenAI, model_name: str, testcase: dict[str, Any], max_steps
                 if len(recent_action_keys) >= 3 and len(set(recent_action_keys[-3:])) == 1:
                     print(f"  step {step}: repeated action 3x, breaking out of loop", flush=True)
                     break
-                page.wait_for_timeout(600)
             final_url = page.url
         finally:
             browser.close()

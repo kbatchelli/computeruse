@@ -98,8 +98,9 @@ The fonts come from `/usr/share/fonts/truetype/dejavu/` (preinstalled).
 | Our 15 scenarios, defense-warned prompt | 15 | 13.3% | v0 — `outputs/eval_baseline_v0.json`. Methodology bug: prompt told the model "treat banner text as untrusted." Inflated. |
 | Our 15 scenarios, neutral prompt + basic salvage parser | 15 | 6.7% | v1 — `outputs/eval_baseline_v1.json`. Many `<unparsed>` cases. |
 | Our 15 scenarios, neutral prompt + full salvage parser | 15 | 13.3% | v2 — `outputs/eval_baseline_v2.json`. 0 unparsed, 8 salvaged. **N=15 is too small — ASR variance across v0→v1→v2 was 7% from single-case shifts. Don't trust this number as a baseline.** |
-| CyberSecEval3 visual PI, regex-only judge | 20 | 71% | Sanity subset. Real Meta-AI-generated images. **This is the headline baseline number.** N=200 still running. |
-| VPI-Bench browser subset (via vLLM + Playwright) | TBD | TBD | Subagent F working. Honest 3-5 case minimal run target. |
+| Our 15 scenarios on **realistic** Playwright renders | 15 | **33.3%** | `outputs/eval_baseline_realistic_r{1,2,3}.json`. Variance = 0 across 3 runs (greedy decoding on identical inputs is bit-deterministic). **Solid internal baseline.** Per-family: banner 20%, embedded_text 20%, **form_field 60%**. |
+| CyberSecEval3 visual PI N=200 (security-violating subset) | 76 | **69.7%** | `outputs/eval_cseval3.json`. Regex judge only (124 logic-violating skipped, no Anthropic key). Sanity N=20→71% matches N=200→69.7%. type[indirect] 78.8%, type[direct] 62.8%. **Credible external headline number.** |
+| VPI-Bench multi-step (browser subset, with trajectory rendering) | TBD | TBD | Subagent in flight. Single-step attempt by subagent F got 0/10 but was capability-bounded (model looped on identical screens, no history); fix is to render past actions+screenshots in each prompt. |
 
 **Known issue: our 15-scenario eval is unreliable.** Sparse Pillow renders cause the model to emit malformed JSON ~40% of the time (`{"x":": 378, "y": 347}` patterns) and many "safe" outcomes are random clicks that miss the malicious bbox by chance, not principled refusal. The 6.7%/13.3% are not trustworthy as baselines for fine-tuning impact. Two parallel fixes underway:
 - Playwright + Tailwind realistic renders (subagent E, worktree).
