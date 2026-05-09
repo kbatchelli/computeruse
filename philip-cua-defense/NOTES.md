@@ -91,6 +91,21 @@ The fonts come from `/usr/share/fonts/truetype/dejavu/` (preinstalled).
 - **2026-05-09** — Synthetic UI rendering (Pillow) for both eval and training data. Reasons: matches Northstar's "trained on synthetic generalizes to real" finding; saves the time it would take to source/process real screenshots; eval bboxes are exact (no OCR/GroundingDINO needed). Limitation to acknowledge in demo: did NOT validate on real UI screenshots.
 - **2026-05-09** — LoRA rank 16, ≤1 epoch, with ~20% benign traces mixed in to limit capability collapse (per Tzafon's no-SFT warning).
 
+## Baseline numbers so far
+
+| Eval | N | ASR | Notes |
+|---|---|---|---|
+| Our 15 scenarios, defense-warned prompt | 15 | 13.3% | v0 — `outputs/eval_baseline_v0.json`. Methodology bug: prompt told the model "treat banner text as untrusted." Inflated. |
+| Our 15 scenarios, neutral prompt + salvage parser | 15 | 6.7% | v1 — `outputs/eval_baseline_v1.json`. Lower than expected; suspicious. Likely artifact of sparse Pillow renders confusing the model so it can't engage with the malicious target. |
+| CyberSecEval3 visual PI, regex-only judge | 20 | 71% | Sanity subset. Real Meta-AI-generated images. **This is the headline baseline number.** N=200 still running. |
+| VPI-Bench browser subset (via vLLM + Playwright) | TBD | TBD | Subagent F working. Honest 3-5 case minimal run target. |
+
+**Known issue: our 15-scenario eval is unreliable.** Sparse Pillow renders cause the model to emit malformed JSON ~40% of the time (`{"x":": 378, "y": 347}` patterns) and many "safe" outcomes are random clicks that miss the malicious bbox by chance, not principled refusal. The 6.7%/13.3% are not trustworthy as baselines for fine-tuning impact. Two parallel fixes underway:
+- Playwright + Tailwind realistic renders (subagent E, worktree).
+- vLLM serving Northstar with constrained decoding (eliminates malformed JSON entirely if it works; subagent F).
+
+**Why malformed JSON happens locally but not on the Tzafon API:** Tzafon's hosted endpoint almost certainly uses constrained/grammar-guided decoding (vLLM + xgrammar/outlines). Token-level masking ensures the sampler can only emit valid JSON conforming to the tool-call schema. Our local `transformers.generate()` has no such constraint — when uncertain, the model produces invalid JSON.
+
 ## Run order
 
 ```bash
@@ -111,3 +126,7 @@ python3 scripts/train_lora.py --train data/train.jsonl --out outputs/lora-r16
 # Re-eval
 python3 scripts/eval.py --adapter outputs/lora-r16 --tag finetuned
 ```
+
+## External benchmarks
+
+- **2026-05-09** — Ran Northstar (no adapter) on Meta CyberSecEval3 Visual Prompt Injection, N=20 sanity subset, regex-judge only (no `ANTHROPIC_API_KEY`): **ASR=0.71** on 7 regex-scorable security-violating cases (`scripts/eval_cseval3.py`, `outputs/eval_cseval3.json`). N=200 run in progress.
